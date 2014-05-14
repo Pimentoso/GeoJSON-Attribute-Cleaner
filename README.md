@@ -2,7 +2,7 @@ GeoJSON-Attribute-Cleaner
 =========================
 
 Simple web based attribute cleaner for reducing GeoJSON file size. 
-Removes every attribute from a GeoJSON except country ID and country name.
+Removes every attribute from a GeoJSON except country ID and country name. Also removes whitespace.
 Input must be a valid JSON.
 
 ## How to produce a GeoJSON on MacOSX
@@ -35,3 +35,8 @@ Output:
 ```json
 {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"name":"Barbados"},"geometry":{"type":"Polygon","coordinates":[[[-59.493,13.082],[-59.611,13.102],[-59.647,13.303],[-59.592,13.318],[-59.428,13.153],[-59.493,13.082]]]},"id":"BRB"}]}
 ```
+
+## References
+
+- http://blog.thematicmapping.org/2012/11/how-to-minify-geojson-files.html
+- http://bost.ocks.org/mike/map/
