@@ -14,7 +14,7 @@ Simple steps to produce a GeoJSON too feed to this cleaner:
 brew install gdal
 ```
 
-- Download the shapefile for world countries from NaturalEarthData ([example])(http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/50m/cultural/ne_50m_admin_0_map_units.zip)
+- Download the shapefile for world countries from NaturalEarthData. [Example zip file](http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/50m/cultural/ne_50m_admin_0_map_units.zip)
 - Unzip it.
 - Navigate to the unzipped folder using the terminal.
 - Run `ogr2ogr` to convert the shapefile in a GeoJSON
