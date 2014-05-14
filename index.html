@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>GeoJSON Attribute Cleaner</title>
+	<style>
+		* { font-family: Arial, Helvetica, sans-serif; }
+	</style>
+	<script type="text/javascript">
+
+	function process() {
+		var text_area_input = document.getElementById('geo-input');
+		var select_id = document.getElementById('select_id_field');
+		var geojson = text_area_input.value;
+		var converted = JSON.parse(geojson);
+
+		var id_field = select_id.value;
+		var name_field = 'name'; // field containing country name to keep
+
+		for (var i = 0; i < converted.features.length; i++) {
+			var feat = converted.features[i];
+			var country_id = '';
+			for (var prop in feat.properties) {
+					if (prop == id_field) {
+						country_id = feat.properties[prop];
+						feat["id"] = country_id;
+					}
+		      if (prop != name_field) {
+		      	delete feat.properties[prop];
+		      }
+		  }
+		}
+
+	  var reduced_geojson = JSON.stringify(converted);
+	  var text_area_output = document.getElementById('geo-output');
+	  text_area_output.value = reduced_geojson;
+	}
+
+	</script>
+</head>
+<body>
+	<h2>GeoJSON Attribute Cleaner</h2>
+	<p>Paste GeoJSON here:</p>
+	<textarea id="geo-input" rows="20" cols="100"></textarea>
+	<br />
+	<p>
+		Select country ID: 
+		<select id="select_id_field">
+			<option value="postal">2-letter code</option>
+			<option value="adm0_a3" selected="selected">3-letter code</option>
+			<option value="iso_3166_2">US-XX code (for the United States)</option>
+		</select>
+	</p>
+	<input type="button" id="button-go" onclick="javascript:process();" value="Process" style="margin-left: 100px; width: 300px;" /> 
+	<br />
+	<p>Cleaned output:</p>
+	<textarea id="geo-output" rows="20" cols="100"></textarea>
+	<p style="font-size: 0.7em; font-style: italic;">Copy and paste this result in a JSON file.</p>
+</body>
+</html>
+
+
+
+
