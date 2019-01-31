@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>GeoJSON Attribute Cleaner</title>
+  <style>
+    * { font-family: Arial, Helvetica, sans-serif; }
+  </style>
+  <script type="text/javascript">
+    function process() {
+      var text_area_input = document.getElementById('geo-input');
+      var select_id = document.getElementById('select_id_field');
+      var geojson = text_area_input.value;
+      var converted = JSON.parse(geojson);
+      var output = {}
+
+      var id_field = select_id.value;
+      var name_field = 'NAME'; // field containing country name to keep
+      var new_name_field = 'name';
+      var correct_name = null; // needed to overwrite the correct name of states
+
+      // united kingdom has a special treatment
+      var uk = 'United Kingdom';
+
+      for (var i = 0; i < converted.features.length; i++) {
+        var feat = converted.features[i];
+        var country_id = '';
+        var sovereignt = feat.properties['SOVEREIGNT'];
+        var admin = feat.properties['ADMIN'];
+        for (var prop in feat.properties) {
+          if (prop == id_field) {
+            country_id = feat.properties[prop];
+            feat["id"] = country_id;
+            // uk
+            if (admin == uk) {
+              feat["id"] = 'GBR';
+              country_id = 'GBR';
+            }
+            // france
+            if (country_id == 'FXX') {
+              feat["id"] = 'FRA';
+            }
+          }
+          if (prop == name_field) {
+            feat.properties[new_name_field] = feat.properties[prop];
+            if (feat.properties[prop] == sovereignt) {
+              correct_name = feat.properties[prop];
+            }
+
+            // uk
+            if (admin == uk) {
+              feat.properties[new_name_field] = uk;
+            }
+          }
+          delete feat.properties[prop];
+        }
+        // populate output
+        elem = output[country_id];
+        if (elem == null) {
+          elem = {};
+          elem.id = feat.id;
+          elem.type = "Feature";
+          elem.properties = feat.properties;
+          elem.geometry = {};
+          elem.geometry.type = feat.geometry.type;
+          elem.geometry.coordinates = feat.geometry.coordinates;
+        } else {
+          // fix name
+          if (correct_name != null) {
+            elem.properties.name = correct_name;
+          }
+          // merge geometries
+          new_coordinates = feat.geometry.coordinates;
+          if (feat.geometry.type == "Polygon") {
+            new_coordinates = [new_coordinates]
+          }
+
+          if (elem.geometry.type == "Polygon") {
+            elem.geometry.type = "MultiPolygon"
+            elem.geometry.coordinates = [elem.geometry.coordinates].concat(new_coordinates)
+          } else {
+            elem.geometry.coordinates = elem.geometry.coordinates.concat(new_coordinates)
+          }
+        }
+        output[country_id] = elem;
+        correct_name = null;
+      }
+
+      output_array = [];
+      keys = Object.keys(output);
+      for (i = 0; i < keys.length; i++) {
+        output_array.push(output[keys[i]]);
+      }
+
+      var reduced_geojson = JSON.stringify({
+        'features': output_array,
+        'type': 'FeatureCollection'
+      });
+      var text_area_output = document.getElementById('geo-output');
+      text_area_output.value = reduced_geojson;
+    }
+  </script>
+</head>
+
+<body>
+  <h2>GeoJSON Attribute Cleaner</h2>
+  <p>Paste GeoJSON here:</p>
+  <textarea id="geo-input" rows="20" cols="100"></textarea>
+  <br />
+  <p>
+    Select country ID:
+    <select id="select_id_field">
+      <option value="postal">2-letter code</option>
+      <option value="adm0_a3">3-letter code OLD</option>
+      <option value="GU_A3" selected="selected">3-letter code</option>
+    </select>
+  </p>
+  <input type="button" id="button-go" onclick="javascript:process();" value="Process" style="margin-left: 100px; width: 300px;" />
+  <br />
+  <p>Cleaned output:</p>
+  <textarea id="geo-output" rows="20" cols="100"></textarea>
+  <p style="font-size: 0.7em; font-style: italic;">Copy and paste this result in a JSON file.</p>
+</body>
+
+</html>
