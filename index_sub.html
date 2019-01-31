@@ -20,26 +20,40 @@
       var new_name_field = 'name';
       var correct_name = null; // needed to overwrite the correct name of states
 
-      // united kingdom has a special treatment
-      var uk = 'United Kingdom';
+      // special treatment
+      var special = [
+        ['United Kingdom', 'GBR'],
+        ['Republic of Serbia', 'SRB'],
+        ['Bosnia and Herzegovina', 'BIH'],
+        ['Belgium', 'BEL']
+        ];
 
       for (var i = 0; i < converted.features.length; i++) {
         var feat = converted.features[i];
         var country_id = '';
         var sovereignt = feat.properties['SOVEREIGNT'];
         var admin = feat.properties['ADMIN'];
+        var name = feat.properties[name_field];
+        var adm0_a3 = feat.properties['ADM0_A3']
+
         for (var prop in feat.properties) {
           if (prop == id_field) {
             country_id = feat.properties[prop];
             feat["id"] = country_id;
-            // uk
-            if (admin == uk) {
-              feat["id"] = 'GBR';
-              country_id = 'GBR';
+
+            // correct id for
+            if (admin == name) {
+              feat["id"] = adm0_a3;
+              country_id = adm0_a3;
             }
-            // france
-            if (country_id == 'FXX') {
-              feat["id"] = 'FRA';
+
+            // special
+            for (var sp = 0; sp < special.length; sp++) {
+              if (admin == special[sp][0]) {
+                var new_id = special[sp][1];
+                feat["id"] = new_id;
+                country_id = new_id;
+              }
             }
           }
           if (prop == name_field) {
@@ -48,9 +62,11 @@
               correct_name = feat.properties[prop];
             }
 
-            // uk
-            if (admin == uk) {
-              feat.properties[new_name_field] = uk;
+            // special
+            for (var sp = 0; sp < special.length; sp++) {
+              if (admin == special[sp][0]) {
+                feat.properties[new_name_field] = special[sp][0];
+              }
             }
           }
           delete feat.properties[prop];
