@@ -1,7 +1,7 @@
 GeoJSON-Attribute-Cleaner
 =========================
 
-Simple web based attribute cleaner for reducing GeoJSON file size. 
+Simple web based attribute cleaner for reducing GeoJSON file size.
 Removes every attribute from a GeoJSON except country ID and country name. Also removes whitespace.
 Input must be a valid JSON.
 
@@ -35,6 +35,13 @@ Output:
 ```json
 {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"name":"Barbados"},"geometry":{"type":"Polygon","coordinates":[[[-59.493,13.082],[-59.611,13.102],[-59.647,13.303],[-59.592,13.318],[-59.428,13.153],[-59.493,13.082]]]},"id":"BRB"}]}
 ```
+
+## Revision
+
+Some states, (eg. France) would include lots of other unrelated geographical states. To split those use the same process with [this file](https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/50m/cultural/ne_50m_admin_0_map_subunits.zip50m/cultural/ne_50m_admin_0_map_units.zip)
+
+use the index_sub.html
+at last, add the us_states.element at the end of the array.
 
 ## References
 
